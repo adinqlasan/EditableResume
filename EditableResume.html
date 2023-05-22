@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Editable Resume</title>
+  <style>
+    /* Styles for Resume Display */
+    body {
+      background-image: url('bg.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 40px;
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .resume__header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .resume__header img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center;
+      margin-bottom: 10px;
+    }
+
+    .resume__section {
+      margin-bottom: 20px;
+    }
+
+    .resume__section h2 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .resume__list {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+
+    .resume__list li {
+      margin-bottom: 5px;
+    }
+
+    /* Styles for Editing Mode */
+    .editable {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .editable::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .editable:hover::after {
+      opacity: 1;
+    }
+
+    .editable:focus::after {
+      opacity: 1;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .editable-textarea {
+      width: 100%;
+      min-height: 50px;
+      resize: vertical;
+      border: none;
+      background-color: transparent;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      padding: 5px;
+    }
+
+    .editable-input {
+      width: 100%;
+      border: none;
+      background-color: transparent;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="resume__header">
+      <img class="editable" src="userphoto.jpg" alt="user photo" contenteditable="true">
+      <h1 class="editable" contenteditable="true">Aira Dinglasan</h1>
+    </div>
+    <div class="resume__section">
+      <h2>Contact Information:</h2>
+      <p class="editable" contenteditable="true">Email: <span class="editable-input" contenteditable="true">dinglasanaira1231@gmail.com</span></p>
+      <p class="editable" contenteditable="true">Phone: <span class="editable-input" contenteditable="true">+63 9611 748 944</span></p>
+      <p class="editable" contenteditable="true">Address: <span class="editable-input" contenteditable="true">Cabuyao,Laguna</span></p>
+    </div>
+    <div class="resume__section">
+      <h2>Education:</h2>
+      <ul class="resume__list editable" contenteditable="true">
+        <li><span class="editable-input" contenteditable="true"> </span></li>
+        <li><span class="editable-input" contenteditable="true">High School Diploma, Malayan Colleges Laguna</span></li>
+      </ul>
+    </div>
+    <div class="resume__section">
+      <h2>Experience:</h2>
+      <ul class="resume__list editable" contenteditable="true">
+        <li><span class="editable-input" contenteditable="true"> </span></li>
+        <li><span class="editable-input" contenteditable="true">Intern, Creotec Inc.</span></li>
+      </ul>
+    </div>
+    <div class="resume__section">
+      <h2>Skills:</h2>
+      <ul class="resume__list editable" contenteditable="true">
+        <li><span class="editable-input" contenteditable="true">Python</span></li>
+        <li><span class="editable-input" contenteditable="true">Java</span></li>
+        <li><span class="editable-input" contenteditable="true">C++</span></li>
+        <li><span class="editable-input" contenteditable="true">Web Development</span></li>
+        <li><span class="editable-input" contenteditable="true">Problem Solving</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Enable content editing for elements with 'editable' class
+    const editableElements = document.querySelectorAll('.editable');
+
+    editableElements.forEach(element => {
+      const inputElement = element.querySelector('.editable-input');
+
+      element.addEventListener('input', () => {
+        element.setAttribute('data-edited', 'true');
+        saveResume();
+      });
+
+      // Detect line breaks in textareas and apply appropriate height
+      if (inputElement && inputElement.tagName.toLowerCase() === 'textarea') {
+        inputElement.addEventListener('input', () => {
+          inputElement.style.height = 'auto';
+          inputElement.style.height = `${inputElement.scrollHeight}px`;
+        });
+      }
+    });
+
+    // Save the modified resume to local storage
+    function saveResume() {
+      const resumeData = {
+        profilePicture: document.querySelector('.resume__header img').getAttribute('src'),
+        name: document.querySelector('h1').innerText,
+        email: document.querySelector('.resume__section:nth-child(2) p').innerText,
+        phone: document.querySelector('.resume__section:nth-child(2) p:nth-child(3)').innerText,
+        address: document.querySelector('.resume__section:nth-child(2) p:nth-child(4)').innerText,
+        education: Array.from(document.querySelectorAll('.resume__section:nth-child(3) li span')).map(span => span.innerText),
+        experience: Array.from(document.querySelectorAll('.resume__section:nth-child(4) li span')).map(span => span.innerText),
+        skills: Array.from(document.querySelectorAll('.resume__section:nth-child(5) li span')).map(span => span.innerText)
+      };
+
+      // Store the resume data in local storage
+      localStorage.setItem('resume', JSON.stringify(resumeData));
+    }
+
+    // Load the resume data from local storage
+    function loadResume() {
+      const resumeData = JSON.parse(localStorage.getItem('resume'));
+
+      if (resumeData) {
+        document.querySelector('.resume__header img').setAttribute('src', resumeData.profilePicture);
+        document.querySelector('h1').innerText = resumeData.name;
+        document.querySelector('.resume__section:nth-child(2) p').innerText = resumeData.email;
+        document.querySelector('.resume__section:nth-child(2) p:nth-child(3)').innerText = resumeData.phone;
+        document.querySelector('.resume__section:nth-child(2) p:nth-child(4)').innerText = resumeData.address;
+
+        const educationList = document.querySelector('.resume__section:nth-child(3) ul');
+        educationList.innerHTML = '';
+        resumeData.education.forEach(item => {
+          const li = document.createElement('li');
+          const span = document.createElement('span');
+          span.innerText = item;
+          span.classList.add('editable-input');
+          li.appendChild(span);
+          educationList.appendChild(li);
+        });
+
+        const experienceList = document.querySelector('.resume__section:nth-child(4) ul');
+        experienceList.innerHTML = '';
+        resumeData.experience.forEach(item => {
+          const li = document.createElement('li');
+          const span = document.createElement('span');
+          span.innerText = item;
+          span.classList.add('editable-input');
+          li.appendChild(span);
+          experienceList.appendChild(li);
+        });
+
+        const skillsList = document.querySelector('.resume__section:nth-child(5) ul');
+        skillsList.innerHTML = '';
+        resumeData.skills.forEach(item => {
+          const li = document.createElement('li');
+          const span = document.createElement('span');
+          span.innerText = item;
+          span.classList.add('editable-input');
+          li.appendChild(span);
+          skillsList.appendChild(li);
+        });
+      }
+    }
+
+    // Load the resume when the page loads
+    document.addEventListener('DOMContentLoaded', loadResume);
+  </script>
+</body>
+</html>
